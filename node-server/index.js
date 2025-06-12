@@ -7,6 +7,7 @@ const FoodDb = require("./models/Food");
 const NODE_PORT = 3001;
 const INSERT_ENDPOINT = "/insert";
 const READ_ENDPOINT = "/read";
+const UPD_ENDPOINT = "/update";
 
 app.use(express.json());
 app.use(cors());
@@ -35,6 +36,23 @@ app.get(READ_ENDPOINT, async (req, res) => {
   } catch (err) {
     console.log(err);
   }
+});
+
+app.put(UPD_ENDPOINT, async (request, response) => {
+  const foodName = request.body.foodName || request.body.newFoodName;
+  const id = request.body.id;
+
+  FoodDb.findByIdAndUpdate(id, { foodName }, { new: true })
+    .then((updatedDoc) => {
+      if (updatedDoc) {
+        response.send({ ...updatedDoc, status: 200 });
+      } else {
+        console.log("document not found");
+      }
+    })
+    .catch((error) => {
+      console.error("Error updating document:", error);
+    });
 });
 
 app.listen(NODE_PORT, () => {
