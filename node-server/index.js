@@ -6,6 +6,7 @@ const FoodDb = require("./models/Food");
 
 const NODE_PORT = 3001;
 const INSERT_ENDPOINT = "/insert";
+const READ_ENDPOINT = "/read";
 
 app.use(express.json());
 app.use(cors());
@@ -24,6 +25,15 @@ app.post(INSERT_ENDPOINT, async (request, response) => {
     response.send(JSON.stringify({ foodName, daysSinceEaten, Status: 201 }));
   } catch (err) {
     console.error("food.save() failed.", err.message || "no error message");
+  }
+});
+
+app.get(READ_ENDPOINT, async (req, res) => {
+  try {
+    const foodList = await FoodDb.find({});
+    res.send(foodList);
+  } catch (err) {
+    console.log(err);
   }
 });
 
