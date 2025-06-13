@@ -5,9 +5,10 @@ const cors = require("cors");
 const FoodDb = require("./models/Food");
 
 const NODE_PORT = 3001;
-const INSERT_ENDPOINT = "/insert";
+const CREATE_ENDPOINT = "/insert";
 const READ_ENDPOINT = "/read";
-const UPD_ENDPOINT = "/update";
+const UPDATE_ENDPOINT = "/update";
+const DELETE_ENDPOINT = "/delete/:id";
 
 app.use(express.json());
 app.use(cors());
@@ -16,7 +17,7 @@ mongoose.connect(
   "mongodb+srv://cdelerme7673:kzeFAtdEJYufAsTL@crud.uhiukhv.mongodb.net/?retryWrites=true&w=majority&appName=CRUD"
 );
 
-app.post(INSERT_ENDPOINT, async (request, response) => {
+app.post(CREATE_ENDPOINT, async (request, response) => {
   const foodName = request.body.foodName;
   const daysSinceEaten = request.body.daysSinceEaten;
 
@@ -38,7 +39,7 @@ app.get(READ_ENDPOINT, async (req, res) => {
   }
 });
 
-app.put(UPD_ENDPOINT, async (request, response) => {
+app.put(UPDATE_ENDPOINT, async (request, response) => {
   const foodName = request.body.foodName || request.body.newFoodName;
   const id = request.body.id;
 
@@ -47,12 +48,21 @@ app.put(UPD_ENDPOINT, async (request, response) => {
       if (updatedDoc) {
         response.send({ ...updatedDoc, status: 200 });
       } else {
-        console.log("document not found");
+        console.error("document not found");
       }
     })
     .catch((error) => {
       console.error("Error updating document:", error);
     });
+});
+
+app.delete(DELETE_ENDPOINT, async (request, response) => {
+  try {
+    const deletedDocument = await FoodDb.findByIdAndDelete(request.params.id);
+    response.send({ ...deletedDocument, status: 200 });
+  } catch (error) {
+    console.error("Error deleting document:", error);
+  }
 });
 
 app.listen(NODE_PORT, () => {
